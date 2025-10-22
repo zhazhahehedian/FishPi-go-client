@@ -30,17 +30,21 @@ cd FishPi-go-client
 go mod download
 
 # 编译程序
-go build -o fishpi cmd/fishpi/main.go
+# Windows:
+go build -o fishpi.exe ./cmd/fishpi
+
+# Linux/macOS:
+go build -o fishpi ./cmd/fishpi
 
 # 运行程序
 ./fishpi        # Linux/macOS
-fishpi.exe      # Windows
+.\fishpi.exe    # Windows
 ```
 
-或者直接运行：
+或者直接运行（无需编译）：
 
 ```bash
-go run cmd/fishpi/main.go
+go run ./cmd/fishpi
 ```
 
 ### 使用方式

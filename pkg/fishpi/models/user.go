@@ -2,30 +2,31 @@ package models
 
 // User 用户信息
 type User struct {
-	OID                  string     `json:"oId"`
-	UserNo               int        `json:"userNo"`
-	UserName             string     `json:"userName"`
-	UserNickname         string     `json:"userNickname"`
-	UserRole             string     `json:"userRole"`
-	UserAvatarURL        string     `json:"userAvatarURL"`
-	UserCity             string     `json:"userCity"`
-	UserOnlineFlag       bool       `json:"userOnlineFlag"`
-	OnlineMinute         int        `json:"onlineMinute"`
-	UserPoint            int        `json:"userPoint"`
-	UserAppRole          int        `json:"userAppRole"`
-	UserIntro            string     `json:"userIntro"`
-	UserURL              string     `json:"userURL"`
-	CardBg               string     `json:"cardBg"`
-	FollowingUserCount   int        `json:"followingUserCount"`
-	SysMetal             string     `json:"sysMetal"`
-	UserProvince         string     `json:"userProvince,omitempty"`
-	UserUsedPoint        int        `json:"userUsedPoint,omitempty"`
-	UserCommentCount     int        `json:"userCommentCount,omitempty"`
-	UserArticleCount     int        `json:"userArticleCount,omitempty"`
-	UserFollowerStatus   int        `json:"userFollowerStatus,omitempty"`
-	UserCommentStatus    int        `json:"userCommentStatus,omitempty"`
-	UserOnlineStatus     int        `json:"userOnlineStatus,omitempty"`
-	UserUAStatus         int        `json:"userUAStatus,omitempty"`
+	OID                      string `json:"oId"`
+	UserNo                   string `json:"userNo"` // API返回的是字符串类型
+	UserName                 string `json:"userName"`
+	UserNickname             string `json:"userNickname"`
+	UserRole                 string `json:"userRole"`
+	UserAvatarURL            string `json:"userAvatarURL"`
+	UserCity                 string `json:"userCity"`
+	UserOnlineFlag           bool   `json:"userOnlineFlag"`
+	OnlineMinute             int    `json:"onlineMinute"`
+	UserPoint                int    `json:"userPoint"`
+	UserAppRole              string `json:"userAppRole"` // API返回的是字符串类型
+	UserIntro                string `json:"userIntro"`
+	UserURL                  string `json:"userURL"`
+	CardBg                   string `json:"cardBg"`
+	FollowingUserCount       int    `json:"followingUserCount"`
+	FollowerCount            int    `json:"followerCount"` // 添加粉丝数量字段
+	SysMetal                 string `json:"sysMetal"`
+	UserProvince             string `json:"userProvince,omitempty"`
+	UserUsedPoint            int    `json:"userUsedPoint,omitempty"`
+	UserCommentCount         int    `json:"userCommentCount,omitempty"`
+	UserArticleCount         int    `json:"userArticleCount,omitempty"`
+	UserFollowerStatus       int    `json:"userFollowerStatus,omitempty"`
+	UserCommentStatus        int    `json:"userCommentStatus,omitempty"`
+	UserOnlineStatus         int    `json:"userOnlineStatus,omitempty"`
+	UserUAStatus             int    `json:"userUAStatus,omitempty"`
 	UserCurrentCheckinStreak int    `json:"userCurrentCheckinStreak,omitempty"`
 }
 
@@ -61,4 +62,3 @@ type LivenessReward struct {
 type LivenessCollectedStatus struct {
 	IsCollectedYesterdayLivenessReward bool `json:"isCollectedYesterdayLivenessReward"`
 }
-

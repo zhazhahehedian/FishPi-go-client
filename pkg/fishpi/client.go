@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 	"time"
 
 	"go.uber.org/zap"
@@ -24,12 +25,13 @@ const (
 
 // Client 摸鱼派客户端
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
-	UserAgent  string
-	APIKey     string
-	Logger     *zap.Logger
-	lastReq    time.Time
+	BaseURL       string
+	HTTPClient    *http.Client
+	UserAgent     string
+	APIKey        string
+	Logger        *zap.Logger
+	lastReqByPath map[string]time.Time // 记录每个接口端点的上次请求时间
+	mu            sync.Mutex           // 保护lastReqByPath的并发访问
 }
 
 // ClientOption 客户端配置选项
@@ -72,8 +74,9 @@ func NewClient(opts ...ClientOption) *Client {
 		HTTPClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
-		UserAgent: DefaultUserAgent,
-		Logger:    logger,
+		UserAgent:     DefaultUserAgent,
+		Logger:        logger,
+		lastReqByPath: make(map[string]time.Time),
 	}
 
 	for _, opt := range opts {
@@ -124,23 +127,39 @@ func (c *Client) doRequest(method, path string, body interface{}, needsAuth bool
 		req.URL.RawQuery = q.Encode()
 	}
 
-	// 请求频率控制
-	if time.Since(c.lastReq) < MinRequestInterval*time.Second {
-		waitTime := MinRequestInterval*time.Second - time.Since(c.lastReq)
-		c.Logger.Info("等待请求间隔", zap.Duration("wait_time", waitTime))
-		time.Sleep(waitTime)
+	// 请求频率控制 - 针对单个接口端点
+	c.mu.Lock()
+	lastReq, exists := c.lastReqByPath[path]
+	if exists {
+		elapsed := time.Since(lastReq)
+		if elapsed < MinRequestInterval*time.Second {
+			waitTime := MinRequestInterval*time.Second - elapsed
+			c.mu.Unlock()
+			c.Logger.Info("等待接口请求间隔",
+				zap.String("path", path),
+				zap.Duration("wait_time", waitTime),
+			)
+			time.Sleep(waitTime)
+			c.mu.Lock()
+		}
 	}
+	c.mu.Unlock()
 
 	// 记录请求
 	c.Logger.Info("发送请求",
 		zap.String("method", method),
 		zap.String("url", url),
+		zap.String("path", path),
 		zap.Bool("needs_auth", needsAuth),
 	)
 
 	// 发送请求
 	resp, err := c.HTTPClient.Do(req)
-	c.lastReq = time.Now()
+
+	// 记录本次请求时间
+	c.mu.Lock()
+	c.lastReqByPath[path] = time.Now()
+	c.mu.Unlock()
 
 	if err != nil {
 		return nil, fmt.Errorf("请求失败: %w", err)
@@ -163,10 +182,18 @@ func (c *Client) parseResponse(resp *http.Response, target interface{}) error {
 	)
 
 	if resp.StatusCode != http.StatusOK {
+		c.Logger.Error("HTTP请求失败",
+			zap.Int("status_code", resp.StatusCode),
+			zap.String("response", string(body)),
+		)
 		return fmt.Errorf("请求失败，状态码: %d, 响应: %s", resp.StatusCode, string(body))
 	}
 
 	if err := json.Unmarshal(body, target); err != nil {
+		c.Logger.Error("JSON解析失败",
+			zap.Error(err),
+			zap.String("response", string(body)),
+		)
 		return fmt.Errorf("解析响应失败: %w, 响应: %s", err, string(body))
 	}
 
@@ -189,4 +216,3 @@ func MD5Hash(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
 }
-

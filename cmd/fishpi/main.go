@@ -11,6 +11,7 @@ import (
 	"dpbug/fishpi/go-client/internal/config"
 	"dpbug/fishpi/go-client/pkg/fishpi"
 	"dpbug/fishpi/go-client/pkg/fishpi/models"
+
 	"go.uber.org/zap"
 	"golang.org/x/term"
 )
@@ -42,7 +43,8 @@ func main() {
 			printUserInfo(user)
 			return
 		}
-		fmt.Println("已保存的API Key无效，需要重新登录")
+		fmt.Printf("⚠ 已保存的API Key无效: %v\n", err)
+		fmt.Println("需要重新登录")
 		fmt.Println()
 	}
 
@@ -126,7 +128,7 @@ func printUserInfo(user interface{}) {
 	fmt.Println("\n=== 用户信息 ===")
 	fmt.Printf("用户名: %s\n", userData.Data.UserName)
 	fmt.Printf("昵称: %s\n", userData.Data.UserNickname)
-	fmt.Printf("用户编号: %d\n", userData.Data.UserNo)
+	fmt.Printf("用户编号: %s\n", userData.Data.UserNo)
 	fmt.Printf("积分: %d\n", userData.Data.UserPoint)
 	fmt.Printf("在线时长: %d 分钟\n", userData.Data.OnlineMinute)
 	fmt.Printf("个人主页: %s\n", userData.Data.UserURL)
