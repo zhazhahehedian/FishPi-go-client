@@ -16,7 +16,7 @@
 - 📋 **阶段四**: 清风明月 (待开发)
 - 📋 **阶段五**: CLI 工具开发 (待开发)
 
-**完成日期**: 2025-10-26 | **版本**: v0.2.0-alpha
+**完成日期**: 2025-10-26 | **版本**: v0.2.0
 
 ## 🎯 项目特性
 
@@ -148,40 +148,34 @@ go run ./cmd/fishpi
 ...
 ```
 
-## 📋 API 功能列表
+## 📋 功能列表
 
-### 已实现 API ✅
+### 已实现 ✅
 
-#### 认证模块
-- [x] `POST /api/getKey` - 登录获取 API Key
-- [x] `GET /api/user` - 验证 API Key 并获取用户信息
-- [x] 支持 MFA 双因素认证
+**认证模块**
+- ✅ `POST /api/getKey` - 登录获取 API Key
+- ✅ `GET /api/user` - 验证 API Key 并获取用户信息
+- ✅ 支持 MFA 双因素认证
 
-#### 用户模块
-- [x] `GET /api/user` - 获取当前用户信息
-- [x] `GET /user/<username>` - 查询其他用户信息
-- [x] `GET /user/liveness` - 获取活跃度（含频率控制）
-- [x] `GET /user/checkedIn` - 获取签到状态
-- [x] `GET /activity/yesterday-liveness-reward-api` - 领取昨日活跃奖励
-- [x] `GET /api/activity/is-collected-liveness` - 查询奖励领取状态
+**用户模块**
+- ✅ `GET /api/user` - 获取当前用户信息
+- ✅ `GET /user/liveness` - 获取活跃度
+- ✅ `GET /user/checkedIn` - 获取签到状态
+- ✅ `GET /activity/yesterday-liveness-reward-api` - 领取昨日活跃奖励
 
-#### 配置管理
-- [x] API Key 自动保存和加载
-- [x] 配置文件持久化
-- [x] 跨平台路径支持
+**配置管理**
+- ✅ API Key 自动保存和加载
+- ✅ 配置文件持久化（`~/.fishpi/config.yaml`）
 
-### 计划实现 API 🚧
+### 计划实现 🚧
 
-#### 聊天室模块
-- [ ] `GET /chat-room/more` - 获取聊天历史
-- [ ] `POST /chat-room/send` - 发送消息
-- [ ] `DELETE /chat-room/revoke/<oId>` - 撤回消息
-- [ ] `WSS /chat-room-channel` - WebSocket 实时连接
-- [ ] `POST /chat-room/red-packet/open` - 打开红包
+**聊天室模块**
+- 🚧 获取聊天历史和发送消息
+- 🚧 WebSocket 实时连接
+- 🚧 红包功能（精简版）
 
-#### 清风明月模块
-- [ ] `GET /api/breezemoons` - 获取清风明月列表
-- [ ] `POST /breezemoon` - 发布清风明月
+**清风明月模块**
+- 🚧 查看和发布清风明月
 
 ## 🤝 贡献
 
@@ -197,7 +191,5 @@ MIT License
 
 - [摸鱼派社区](https://fishpi.cn)
 - [摸鱼派 API 文档](https://fishpi.cn/article/1636516552191)
-
-**注意**: 只是成为了调接口侠，我太菜了Orz。
 
 ---
