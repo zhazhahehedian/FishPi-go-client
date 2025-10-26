@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// GetMemberInfo 查询指定用户信息
+// 查询指定用户信息
 func (c *Client) GetMemberInfo(username string) (*models.User, error) {
 	c.Logger.Info("获取用户信息", zap.String("username", username))
 
@@ -24,7 +24,7 @@ func (c *Client) GetMemberInfo(username string) (*models.User, error) {
 		return nil, err
 	}
 
-	// 解析响应 - 注意这个接口直接返回用户对象，不是嵌套在data字段中
+	// 直接返回的用户对象，不是嵌套在data字段中
 	var user models.User
 	if err := c.parseResponse(resp, &user); err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (c *Client) GetMemberInfo(username string) (*models.User, error) {
 	return &user, nil
 }
 
-// GetLiveness 获取用户活跃度
+// 获取用户活跃度
 func (c *Client) GetLiveness() (float64, error) {
 	if c.APIKey == "" {
 		return 0, fmt.Errorf("API Key未设置，请先登录")

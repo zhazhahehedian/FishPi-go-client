@@ -1,7 +1,6 @@
 package fishpi
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -149,19 +148,5 @@ func (c *Client) LoginWithKey(apiKey string) (*models.User, error) {
 	)
 
 	return user, nil
-}
-
-// GetMetalList 解析用户徽章列表
-func GetMetalList(sysMetal string) (*models.UserMetal, error) {
-	if sysMetal == "" {
-		return &models.UserMetal{List: []models.Metal{}}, nil
-	}
-
-	var metalList models.UserMetal
-	if err := json.Unmarshal([]byte(sysMetal), &metalList); err != nil {
-		return nil, fmt.Errorf("解析徽章列表失败: %w", err)
-	}
-
-	return &metalList, nil
 }
 

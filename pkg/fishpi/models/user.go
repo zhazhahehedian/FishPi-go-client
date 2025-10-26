@@ -30,19 +30,6 @@ type User struct {
 	UserCurrentCheckinStreak int    `json:"userCurrentCheckinStreak,omitempty"`
 }
 
-// UserMetal 用户徽章
-type UserMetal struct {
-	List []Metal `json:"list"`
-}
-
-// Metal 徽章
-type Metal struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Attr        string `json:"attr"` // 包含url、backcolor、fontcolor
-	Data        string `json:"data"`
-}
-
 // Liveness 活跃度
 type Liveness struct {
 	Liveness float64 `json:"liveness"`
