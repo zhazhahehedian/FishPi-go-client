@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"dpbug/fishpi/go-client/pkg/fishpi/models"
+
 	"go.uber.org/zap"
 )
 
@@ -140,4 +141,3 @@ func (c *Client) IsCollectedLiveness() (bool, error) {
 
 	return status.IsCollectedYesterdayLivenessReward, nil
 }
-

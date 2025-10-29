@@ -19,6 +19,8 @@ const (
 	DefaultBaseURL = "https://fishpi.cn"
 	// DefaultUserAgent 默认User-Agent
 	DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"
+	// DefaultClientName 默认客户端名称
+	DefaultClientName = "Golang/dpbug-玩具1.0"
 	// MinRequestInterval 最小请求间隔（秒）
 	MinRequestInterval = 30
 )
@@ -28,8 +30,10 @@ type Client struct {
 	BaseURL       string
 	HTTPClient    *http.Client
 	UserAgent     string
+	ClientName    string
 	APIKey        string
 	Logger        *zap.Logger
+	Silent        bool                 // 静默模式：不输出Info/Debug日志
 	lastReqByPath map[string]time.Time // 记录每个接口端点的上次请求时间
 	mu            sync.Mutex           // 保护lastReqByPath的并发访问
 }
@@ -51,6 +55,13 @@ func WithUserAgent(ua string) ClientOption {
 	}
 }
 
+// WithClientName 设置客户端名称
+func WithClientName(name string) ClientOption {
+	return func(c *Client) {
+		c.ClientName = name
+	}
+}
+
 // WithLogger 设置日志记录器
 func WithLogger(logger *zap.Logger) ClientOption {
 	return func(c *Client) {
@@ -65,6 +76,13 @@ func WithHTTPClient(httpClient *http.Client) ClientOption {
 	}
 }
 
+// WithSilent 设置静默模式（不输出Info/Debug日志）
+func WithSilent(silent bool) ClientOption {
+	return func(c *Client) {
+		c.Silent = silent
+	}
+}
+
 // NewClient 创建新的客户端实例
 func NewClient(opts ...ClientOption) *Client {
 	logger, _ := zap.NewProduction()
@@ -75,6 +93,7 @@ func NewClient(opts ...ClientOption) *Client {
 			Timeout: 30 * time.Second,
 		},
 		UserAgent:     DefaultUserAgent,
+		ClientName:    DefaultClientName,
 		Logger:        logger,
 		lastReqByPath: make(map[string]time.Time),
 	}
@@ -135,10 +154,12 @@ func (c *Client) doRequest(method, path string, body interface{}, needsAuth bool
 		if elapsed < MinRequestInterval*time.Second {
 			waitTime := MinRequestInterval*time.Second - elapsed
 			c.mu.Unlock()
-			c.Logger.Info("等待接口请求间隔",
-				zap.String("path", path),
-				zap.Duration("wait_time", waitTime),
-			)
+			if !c.Silent {
+				c.Logger.Info("等待接口请求间隔",
+					zap.String("path", path),
+					zap.Duration("wait_time", waitTime),
+				)
+			}
 			time.Sleep(waitTime)
 			c.mu.Lock()
 		}
@@ -146,12 +167,14 @@ func (c *Client) doRequest(method, path string, body interface{}, needsAuth bool
 	c.mu.Unlock()
 
 	// 记录请求
-	c.Logger.Info("发送请求",
-		zap.String("method", method),
-		zap.String("url", url),
-		zap.String("path", path),
-		zap.Bool("needs_auth", needsAuth),
-	)
+	if !c.Silent {
+		c.Logger.Info("发送请求",
+			zap.String("method", method),
+			zap.String("url", url),
+			zap.String("path", path),
+			zap.Bool("needs_auth", needsAuth),
+		)
+	}
 
 	// 发送请求
 	resp, err := c.HTTPClient.Do(req)
@@ -176,10 +199,12 @@ func (c *Client) parseResponse(resp *http.Response, target interface{}) error {
 		return fmt.Errorf("读取响应体失败: %w", err)
 	}
 
-	c.Logger.Debug("收到响应",
-		zap.Int("status_code", resp.StatusCode),
-		zap.String("body", string(body)),
-	)
+	if !c.Silent {
+		c.Logger.Debug("收到响应",
+			zap.Int("status_code", resp.StatusCode),
+			zap.String("body", string(body)),
+		)
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		c.Logger.Error("HTTP请求失败",
@@ -203,7 +228,9 @@ func (c *Client) parseResponse(resp *http.Response, target interface{}) error {
 // SetAPIKey 设置API Key
 func (c *Client) SetAPIKey(apiKey string) {
 	c.APIKey = apiKey
-	c.Logger.Info("API Key已设置")
+	if !c.Silent {
+		c.Logger.Info("API Key已设置")
+	}
 }
 
 // GetAPIKey 获取当前API Key
